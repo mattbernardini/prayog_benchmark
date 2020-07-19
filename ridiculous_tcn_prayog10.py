@@ -46,7 +46,7 @@ if gpus:
 # Constants we declare for the scope of the file
 LENGTH_OF_INPUTS = 512
 BATCH_SIZE = 64
-NUM_EPOCHS=32
+NUM_EPOCHS=16
 NUM_EXAMPLES = 150
 NUM_TEST_EXAMPLES = 10
 NUM_INPUT_CHANNELS = 42

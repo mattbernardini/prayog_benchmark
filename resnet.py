@@ -33,14 +33,14 @@ import scipy
 from tcn import TCN, tcn_full_summary
 
 # Constants we declare for the scope of the file
-LENGTH_OF_INPUTS = 512
-BATCH_SIZE = 64
-NUM_EPOCHS=32
-NUM_EXAMPLES = 150
-NUM_TEST_EXAMPLES = 10
-NUM_INPUT_CHANNELS = 42
+LENGTH_OF_INPUTS    = 512
+BATCH_SIZE          = 64
+NUM_EPOCHS          = 16
+NUM_EXAMPLES        = 150
+NUM_TEST_EXAMPLES   = 10
+NUM_INPUT_CHANNELS  = 42
 NUM_OUTPUT_CHANNELS = 100
-MIN_L = 12
+MIN_L               = 12
 
 # Adapted from trRosetta, but works for fasta as well
 # read A3M and convert letters into integers in the 0..20 range

@@ -32,6 +32,21 @@ import scipy
 
 from tcn import TCN, tcn_full_summary
 
+num_examples_in_training_set = sum(SEQUENCE_LENGTHS[:NUM_TEST_EXAMPLES])
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+  # Restrict TensorFlow to only use the first GPU
+  try:
+    tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
+    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+    for gpu in tf.config.experimental.list_physical_devices('GPU'):
+        print('Setting gpu growth for', gpu)
+        tf.config.experimental.set_memory_growth(gpu, True)
+    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
+  except RuntimeError as e:
+    # Visible devices must be set before GPUs have been initialized
+    print(e)
+
 # Constants we declare for the scope of the file
 LENGTH_OF_INPUTS = 512
 BATCH_SIZE = 64
@@ -248,17 +263,7 @@ for i, sentence in enumerate(all_sentences):
     x[i] = all_sentences[i]
     y[i] = all_dist_labels[i]
 
-num_examples_in_training_set = sum(SEQUENCE_LENGTHS[:NUM_TEST_EXAMPLES])
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-  # Restrict TensorFlow to only use the first GPU
-  try:
-    tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
-    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
-  except RuntimeError as e:
-    # Visible devices must be set before GPUs have been initialized
-    print(e)
+
 """# Ridiculous LSTM ~ 87 mil parameters"""
 
 my_input = tf.keras.layers.Input(shape = (LENGTH_OF_INPUTS, NUM_INPUT_CHANNELS))

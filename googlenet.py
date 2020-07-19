@@ -32,6 +32,10 @@ import scipy
 
 from tcn import TCN, tcn_full_summary
 
+for gpu in tf.config.experimental.list_physical_devices('GPU'):
+	print('Setting gpu growth for', gpu)
+	tf.config.experimental.set_memory_growth(gpu, True)
+
 # Constants we declare for the scope of the file
 LENGTH_OF_INPUTS = 512
 BATCH_SIZE = 64
@@ -204,51 +208,6 @@ def get_dist_maps(valid_amino_acids, file_pdb):
             ca_map[r1 - 1, r2 - 1] = sqrt((a-p)**2+(b-q)**2+(c-r)**2)
     return L, seq, cb_map, ca_map
 
-all_sentences = []
-all_dist_labels = []
-SEQUENCE_LENGTHS = []
-
-# Takes in any protein's input features and output distances
-# Returns many overlapping crops of the input features and output distances as two lists
-# It probably is a good idea to reduce out_l = 512 but
-#  this has to be done carefully by considering the case of L > out_l
-def make_sentences_nextchars(x, y, min_l = 12, out_l = 512, stride = 1):
-    sentences = []
-    dist_labels = []
-    L = len(x[:, 0])
-    for i in range(min_l, L, stride):
-        myx = np.zeros((out_l, len(x[0, :])))
-        if i > out_l:
-            myx[-i:, :] = x[(i-out_l):i, :]
-        else:
-            myx[-i:, :] = x[:i, :]
-        sentences.append(myx)
-        dist_labels.append(y[i])        
-    return (sentences, dist_labels)
-
-# A set of 150 proteins (PSICOV set)
-for dist_file, i in zip(glob.glob("./data/deepcov/distance/*.npy"), range(NUM_EXAMPLES)):
-    id = os.path.splitext(os.path.basename(dist_file))[0][:5]
-    dmap = get_map(dist_file)
-    # This is the input (X) to the 1D CNN/LSTM architecture
-    input_feature = get_feature('./data/deepcov/features/'+ id + '.pkl')
-    # This is the output (Y) to the model
-    output_dist_profile = map_to_dist_profile(dmap)
-    l = len(input_feature[:, 0])
-    Y = 100.0 / output_dist_profile
-    this_sentences, dist_labels = make_sentences_nextchars(input_feature, Y, out_l=LENGTH_OF_INPUTS, min_l=MIN_L)
-    SEQUENCE_LENGTHS.append(len(this_sentences) + 1)
-    all_sentences.extend(this_sentences)
-    all_dist_labels.extend(dist_labels)
-
-print('Vectorization...')
-x = np.zeros((len(all_sentences), LENGTH_OF_INPUTS, NUM_INPUT_CHANNELS))
-y = np.zeros((len(all_sentences), NUM_OUTPUT_CHANNELS))
-for i, sentence in enumerate(all_sentences):
-    x[i] = all_sentences[i]
-    y[i] = all_dist_labels[i]
-
-num_examples_in_training_set = sum(SEQUENCE_LENGTHS[:NUM_TEST_EXAMPLES])
 """# GoogLeNet CNN """
 
 X = np.zeros((NUM_EXAMPLES, LENGTH_OF_INPUTS, NUM_INPUT_CHANNELS))

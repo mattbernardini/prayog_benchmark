@@ -32,6 +32,20 @@ import scipy
 
 from tcn import TCN, tcn_full_summary
 
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+  # Restrict TensorFlow to only use the first GPU
+  try:
+    tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
+    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
+    for gpu in tf.config.experimental.list_physical_devices('GPU'):
+        print('Setting gpu growth for', gpu)
+        tf.config.experimental.set_memory_growth(gpu, True)
+  except RuntimeError as e:
+    # Visible devices must be set before GPUs have been initialized
+    print(e)
+
 # Constants we declare for the scope of the file
 LENGTH_OF_INPUTS = 512
 BATCH_SIZE = 64
@@ -267,16 +281,7 @@ for dist_file in glob.glob("./data/psicov/distance/*.npy"):
     Y[i, -l:, :] = 100.0 / output_dist_profile
     i += 1
 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-  # Restrict TensorFlow to only use the first GPU
-  try:
-    tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
-    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
-  except RuntimeError as e:
-    # Visible devices must be set before GPUs have been initialized
-    print(e)
+
 
 """ # ResNet CNN """
 with tf.device('/device:GPU:1'):

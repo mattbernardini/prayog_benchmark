@@ -38,6 +38,9 @@ if gpus:
   try:
     tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
     logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+    for gpu in tf.config.experimental.list_physical_devices('GPU'):
+        print('Setting gpu growth for', gpu)
+        tf.config.experimental.set_memory_growth(gpu, True)
     print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
   except RuntimeError as e:
     # Visible devices must be set before GPUs have been initialized

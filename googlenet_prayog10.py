@@ -37,11 +37,10 @@ if gpus:
   # Restrict TensorFlow to only use the first GPU
   try:
     tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
+    tf.config.experimental.set_memory_growth(gpus[1], True)
     logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+
     print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
-    for gpu in tf.config.experimental.list_physical_devices('GPU'):
-        print('Setting gpu growth for', gpu)
-        tf.config.experimental.set_memory_growth(gpu, True)
   except RuntimeError as e:
     # Visible devices must be set before GPUs have been initialized
     print(e)
@@ -49,7 +48,7 @@ if gpus:
 # Constants we declare for the scope of the file
 LENGTH_OF_INPUTS = 512
 BATCH_SIZE = 64
-NUM_EPOCHS=32
+NUM_EPOCHS=2
 NUM_EXAMPLES = 150
 NUM_TEST_EXAMPLES = 10
 NUM_INPUT_CHANNELS = 42
@@ -258,9 +257,7 @@ time_elapsed = datetime.datetime.now()
 googlenet_model.fit(X[:140], 
                     Y[:140], 
                     validation_data=(X[140:], Y[140:]), 
-                    epochs=NUM_EPOCHS, for gpu in tf.config.experimental.list_physical_devices('GPU'):
-	print('Setting gpu growth for', gpu)
-	tf.config.experimental.set_memory_growth(gpu, True)
+                    epochs=NUM_EPOCHS, 
                     batch_size=BATCH_SIZE, 
                     callbacks=[])
 print(f"\nTIME ELAPSED: {datetime.datetime.now() - time_elapsed}\n")

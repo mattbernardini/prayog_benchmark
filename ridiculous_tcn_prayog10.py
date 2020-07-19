@@ -37,10 +37,9 @@ if gpus:
   # Restrict TensorFlow to only use the first GPU
   try:
     tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
+    tf.config.experimental.set_memory_growth(gpus[1], True)
     logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-    for gpu in tf.config.experimental.list_physical_devices('GPU'):
-        print('Setting gpu growth for', gpu)
-        tf.config.experimental.set_memory_growth(gpu, True)
+
     print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPU")
   except RuntimeError as e:
     # Visible devices must be set before GPUs have been initialized
@@ -48,10 +47,10 @@ if gpus:
 
 # Constants we declare for the scope of the file
 LENGTH_OF_INPUTS = 512
-BATCH_SIZE = 64
-NUM_EPOCHS=16
+BATCH_SIZE =32
+NUM_EPOCHS=2
 NUM_EXAMPLES = 150
-NUM_TEST_EXAMPLES = 10
+NUM_TEST_EXAMPLES = 140
 NUM_INPUT_CHANNELS = 42
 NUM_OUTPUT_CHANNELS = 100
 MIN_L = 12
